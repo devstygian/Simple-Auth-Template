@@ -1,4 +1,4 @@
-# 🔐 Simple-Auth-Template
+# Simple-Auth-Template
 
 > *"A good system starts with a simple login — everything else builds on top of it."*
 
@@ -12,17 +12,17 @@
 
 ---
 
-## 📌 About
+## About
 
 Simple-Auth-Template was created to solve a simple but repetitive problem: every project needs authentication, yet most developers end up rewriting the same login/register logic from scratch. This template eliminates that friction by giving you a clean, well-structured auth base you can clone, customize, and build on immediately.
 
 It's purposely kept framework-free (plain PHP + MySQL) so it's easy to understand, easy to modify, and easy to integrate into any environment.
 
-> 📚 For full documentation including repository structure, database schema, and advanced configuration — see the **[Wiki / Docs](https://github.com/yourname/Simple-Auth-Template/wiki)**.
+> For full documentation including repository structure, database schema, and advanced configuration — see the **[Wiki / Docs](https://github.com/yourname/Simple-Auth-Template/wiki)**.
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 | Layer     | Technology                                      |
 |-----------|-------------------------------------------------|
@@ -32,7 +32,7 @@ It's purposely kept framework-free (plain PHP + MySQL) so it's easy to understan
 
 ---
 
-## 🔒 Core Features (MVP)
+## Core Features (MVP)
 
 - ✅ User Registration
 - ✅ User Login
@@ -43,7 +43,7 @@ It's purposely kept framework-free (plain PHP + MySQL) so it's easy to understan
 
 ---
 
-## 🔄 Auth Flow
+## Auth Flow
 
 ```
 Register  →  Validate Input  →  Hash Password  →  Save to DB
@@ -57,7 +57,7 @@ The flow is intentionally simple and transparent — no magic, no hidden middlew
 
 ---
 
-## 🚀 Setup Guide
+## Setup Guide
 
 ### Prerequisites
 
@@ -89,7 +89,7 @@ http://localhost/Simple-Auth-Template/public
 
 ---
 
-## 🎨 UI Stack (Optional Upgrade)
+##  UI Stack (Optional Upgrade)
 
 The core system works with plain HTML/CSS, but you can enhance it with:
 
@@ -100,7 +100,7 @@ Simply link them via CDN in `templates/header.php` to get started.
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 | Version | Features |
 |---------|----------|
@@ -113,7 +113,7 @@ Simply link them via CDN in `templates/header.php` to get started.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This project is open-source and welcomes contributions of all kinds. Here's how to get involved:
 
@@ -127,13 +127,13 @@ Please keep code clean, readable, and consistent with the existing style. Bug re
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** — free to use, modify, and distribute. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👤 Author
+## Author
 
 Built with ☕ by **lzynox**
 - GitHub: [@devstygian](https://github.com/devstygian)
