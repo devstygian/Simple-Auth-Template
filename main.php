@@ -1,3 +1,7 @@
+<?php
+require_once 'includes/config.php'; // Include config file
+checkLogin(); // Check if user is logged in
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -366,11 +370,10 @@
             <a href="#contact">Contact</a>
         </div>
 
-        <a href="#menu" class="nav-button">
-            Order Now
+        <a href="logout.php" class="nav-button">
+            Log Out
         </a>
     </nav>
-
 
     <!-- Hero -->
     <section class="hero" id="home">
