@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 //if already logged in, redirect to main page
 if (isset($_SESSION['users']) && !empty($_SESSION['users'])) {
-    header('Location: main.php');
+    header('Location: ../main.php');
     exit();
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         // valid login
         $_SESSION['users'] = $user; // store user data in session
-        header('Location: main.php');
+        header('Location: ../main.php');
         exit();
     } else {
         $error = 'Invalid username or password';
