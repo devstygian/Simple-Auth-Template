@@ -1,7 +1,5 @@
 # Simple-Auth-Template
 
-> *"A good system starts with a simple login — everything else builds on top of it."*
-
 **Simple-Auth-Template** is a clean, lightweight, and reusable PHP authentication system built as an open-source starter template for modern web applications. Whether you're spinning up a new project or learning how authentication works under the hood, this repo gives you a solid, production-ready foundation — no frameworks required.
 
 ![Status](https://img.shields.io/badge/status-in%20development-yellow)
@@ -135,7 +133,7 @@ This project is licensed under the **MIT License** — free to use, modify, and 
 
 ## Author
 
-Built with ☕ by **lzynox**
+Built with by **lzynox**
 - GitHub: [@devstygian](https://github.com/devstygian)
 
 ---
