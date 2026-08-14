@@ -54,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" name="password" placeholder="Password" required>
             <?php if (!empty($error)) echo "<p style='color:red;'>$error</p>"; ?>
             <button type="submit">Login</button>
+            <p><a href="forgot-password.php">Forgot Password?</a></p>
+            <p>Don't have an account? Register <a href="register.php">here.</a></p>
         </form>
     </div>
 </body>
