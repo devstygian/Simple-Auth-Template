@@ -1,7 +1,3 @@
-<?php
-require_once 'includes/config.php'; // Include config file
-checkLogin(); // Check if user is logged in
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -365,7 +361,7 @@ checkLogin(); // Check if user is logged in
 
         <div class="nav-links">
             <a href="#home">Home</a>
-            <a href="#menu">Menu</a>
+            <a href="src/page2.php">Menu</a>
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
         </div>
