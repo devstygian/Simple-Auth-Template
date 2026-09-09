@@ -1,143 +1,152 @@
 # Simple-Auth-Template — Full Documentation
 
-This document covers everything you need to know about **Simple-Auth-Template** — from project structure and database setup, to how each file works and how to extend the system.
+> **Current focus:** Google OAuth 2.0 / OpenID Connect prototype
+>
+> **Primary integration target:** Nadine Resto-POS customer / landing-page authentication
+>
+> **Long-term goal:** A reusable, framework-free PHP + MySQL authentication template that can be integrated into other projects and eventually released as open source.
+
+This document covers the current authentication system, repository structure, database design, local authentication flow, security practices, and the planned Google authentication integration.
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Repository Structure](#repository-structure)
-3. [File Reference](#file-reference)
-4. [Database Schema](#database-schema)
-5. [Configuration](#configuration)
-6. [Auth Flow (Detailed)](#auth-flow-detailed)
-7. [Core Functions](#core-functions)
-8. [Pages & Routes](#pages--routes)
-9. [Session Management](#session-management)
-10. [Security Practices](#security-practices)
-11. [UI & Styling](#ui--styling)
-12. [Extending the Template](#extending-the-template)
-13. [Common Errors & Fixes](#common-errors--fixes)
-14. [FAQ](#faq)
+2. [Project Goals](#project-goals)
+3. [Repository Structure](#repository-structure)
+4. [Current Authentication](#current-authentication)
+5. [Database Schema](#database-schema)
+6. [Configuration](#configuration)
+7. [Local Auth Flow](#local-auth-flow)
+8. [Core Functions](#core-functions)
+9. [Pages & Routes](#pages--routes)
+10. [Session Management](#session-management)
+11. [Google OAuth / OpenID Connect](#google-oauth--openid-connect)
+12. [Google OAuth Prototype](#google-oauth-prototype)
+13. [Google OAuth Flow](#google-oauth-flow)
+14. [Google Account Mapping](#google-account-mapping)
+15. [Resto-POS Integration](#resto-pos-integration)
+16. [Reusable OAuth Architecture](#reusable-oauth-architecture)
+17. [Development Roadmap](#development-roadmap)
+18. [Security Practices](#security-practices)
+19. [Common Errors & Fixes](#common-errors--fixes)
+20. [FAQ](#faq)
+21. [References](#references)
 
 ---
 
 ## Overview
 
-**Simple-Auth-Template** is a plain PHP + MySQL authentication starter kit. It provides the minimum viable auth system — register, login, session guard, and logout — in a clean folder structure that's easy to read, customize, and scale.
+**Simple-Auth-Template** is a plain PHP + MySQL authentication starter project.
 
-It does **not** use any PHP framework. Everything is written in procedural PHP with a lightweight MVC-lite organization, making it beginner-friendly while still being structured enough for real projects.
+The current implementation provides a basic local authentication foundation:
+
+- Registration
+- Login
+- Password hashing
+- PHP sessions
+- Protected pages
+- Logout
+- Basic project configuration
+
+The project intentionally does not use a PHP framework. The goal is to keep the code readable and understandable for developers who know basic PHP, HTML, CSS, and MySQL.
+
+The next major feature is **Google authentication** using Google's OAuth 2.0 / OpenID Connect capabilities.
+
+The Google integration is being designed as a reusable authentication feature rather than a feature that only belongs to one application.
 
 ---
 
-## Repository Structure
+## Project Goals
 
-```
+### Short-term
+
+- Keep the existing local authentication working.
+- Build a working Google authentication prototype.
+- Authenticate a Google account and create a local PHP session.
+- Store the Google identity against a local user/customer account.
+
+### Medium-term
+
+- Integrate the authentication system into the Resto-POS landing page.
+- Keep customer authentication separate from staff/admin authentication.
+- Improve error handling and security.
+- Make Google OAuth configuration reusable across projects.
+
+### Long-term
+
+- Separate authentication logic from application-specific code.
+- Support additional OAuth providers where practical.
+- Provide clear setup and integration documentation.
+- Publish the reusable authentication template as an open-source project.
+
+---
+
+# Repository Structure
+
+The current repository is intentionally small and is still evolving.
+
+```text
 Simple-Auth-Template/
 │
-├── public/                  # Entry point — all browser-accessible files
-│   ├── index.php            # Landing / redirect page
-│   ├── login.php            # Login page
-│   ├── register.php         # Registration page
-│   ├── dashboard.php        # Protected page (requires login)
-│   ├── logout.php           # Destroys session and redirects
+├── Documentation.md          # Project and authentication documentation
+├── readme.md                 # Short project overview
+├── main.php                  # Main project/demo page
+│
+├── includes/
+│   ├── auth.php              # Authentication logic
+│   ├── config.php            # Application configuration
+│   └── db.php                # Database connection
+│
+├── public/
+│   ├── login.php             # Login page
+│   ├── register.php          # Registration page
+│   ├── logout.php            # Logout endpoint
 │   └── assets/
-│       ├── css/             # Stylesheets
-│       ├── js/              # JavaScript files
-│       └── img/             # Images / icons
+│       └── css/
+│           ├── auth.css
+│           └── style.css
 │
-├── includes/                # Core backend logic (not browser-accessible)
-│   ├── db.php               # Database connection
-│   ├── auth.php             # Auth functions (login, register, guard)
-│   ├── config.php           # App configuration (DB credentials, constants)
-│   └── functions.php        # General helper functions
-│
-├── templates/               # Shared HTML partials
-│   ├── header.php           # HTML head + navbar
-│   └── footer.php           # Closing tags + scripts
-│
-├── database/
-│   └── schema.sql           # MySQL table definitions
-│
-├── README.md
-├── DOCUMENTATION.md
-├── LICENSE
-└── .gitignore
+└── src/
+    ├── footer.php            # Shared footer
+    ├── header.php            # Shared header
+    └── page2.php             # Additional demo page
 ```
 
-> **Note:** Only the `public/` folder should be the web root. The `includes/` and `templates/` folders are intentionally kept outside to prevent direct browser access.
+> The structure may change as the OAuth module becomes more reusable. Do not treat the future architecture described later in this document as the current repository structure.
 
 ---
 
-## File Reference
+# Current Authentication
 
-### `includes/config.php`
-Stores all global configuration constants. This is the first file you should edit after cloning.
+The current system uses traditional application-managed authentication.
 
-```php
-<?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'simple_auth');
-define('BASE_URL', 'http://localhost/Simple-Auth-Template/public');
-?>
+```text
+User
+  ↓
+Login / Register
+  ↓
+PHP
+  ↓
+MySQL
+  ↓
+PHP Session
+  ↓
+Protected Page
 ```
 
----
+Passwords are handled by PHP password hashing functions rather than being stored as plain text.
 
-### `includes/db.php`
-Handles the MySQL database connection using `mysqli`. It uses the constants defined in `config.php`.
-
-```php
-<?php
-require_once 'config.php';
-
-$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-?>
-```
+Google authentication will be added alongside this system instead of immediately replacing it.
 
 ---
 
-### `includes/auth.php`
-The heart of the system. Contains all authentication logic:
+# Database Schema
 
-- `register_user($username, $email, $password)` — validates and saves a new user
-- `login_user($email, $password)` — checks credentials and starts a session
-- `is_logged_in()` — returns `true` if a valid session exists
-- `auth_guard()` — redirects to login if user is not authenticated
-- `logout_user()` — destroys the session and redirects
+The current authentication model uses a local `users` table.
 
----
-
-### `includes/functions.php`
-General-purpose helper functions used across the app. Examples:
-
-- `sanitize($input)` — strips and escapes user input
-- `redirect($url)` — shorthand for `header("Location: ...")` + `exit`
-- `set_flash($type, $message)` — stores a one-time session message
-- `get_flash($type)` — retrieves and clears the flash message
-
----
-
-### `templates/header.php`
-Included at the top of every page. Contains the `<head>` block, meta tags, CSS links, and the navigation bar. Modify this to change the global layout or add Bootstrap/Font Awesome CDN links.
-
----
-
-### `templates/footer.php`
-Included at the bottom of every page. Contains closing `</body>` and `</html>` tags, and any global JS script tags.
-
----
-
-## Database Schema
-
-The system uses a single `users` table.
+Example schema:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS simple_auth;
@@ -145,325 +154,1041 @@ CREATE DATABASE IF NOT EXISTS simple_auth;
 USE simple_auth;
 
 CREATE TABLE users (
-    id          INT(11) AUTO_INCREMENT PRIMARY KEY,
-    username    VARCHAR(100) NOT NULL,
-    email       VARCHAR(150) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Column Breakdown
 
 | Column | Type | Description |
-|--------|------|-------------|
-| `id` | INT, PK, AUTO_INCREMENT | Unique identifier for each user |
-| `username` | VARCHAR(100) | Display name chosen during registration |
-| `email` | VARCHAR(150), UNIQUE | Used as the login identifier |
-| `password` | VARCHAR(255) | Bcrypt-hashed password (never plain text) |
-| `created_at` | TIMESTAMP | Auto-set when the record is created |
+|---|---|---|
+| `id` | INT, PK, AUTO_INCREMENT | Local application user ID |
+| `username` | VARCHAR(100) | User's display name |
+| `email` | VARCHAR(150), UNIQUE | Local account email |
+| `password` | VARCHAR(255) | Password hash for local authentication |
+| `created_at` | TIMESTAMP | Account creation timestamp |
 
-> **Never store plain text passwords.** Simple-Auth-Template uses PHP's `password_hash()` with the `PASSWORD_BCRYPT` algorithm by default.
+### Planned OAuth Extension
 
----
+The Google integration should not use the Google account identifier as the application's primary user ID.
 
-## Configuration
+A future schema can separate provider information from the local user record:
 
-After cloning, open `includes/config.php` and update the following:
+```sql
+CREATE TABLE user_oauth_accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    provider_user_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-| Constant | Default | Description |
-|----------|---------|-------------|
-| `DB_HOST` | `localhost` | Your MySQL server host |
-| `DB_USER` | `root` | MySQL username |
-| `DB_PASS` | *(empty)* | MySQL password |
-| `DB_NAME` | `simple_auth` | Name of your database |
-| `BASE_URL` | `http://localhost/...` | Full base URL of the project |
+    UNIQUE KEY unique_provider_user (
+        provider,
+        provider_user_id
+    ),
 
----
-
-## Auth Flow (Detailed)
-
-### Registration Flow
-
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
 ```
-User fills register form
-        ↓
-Client-side validation (v2+)
+
+This design allows one local user to potentially have multiple authentication providers later.
+
+Example:
+
+```text
+users
+  │
+  ├── local password
+  │
+  └── user_oauth_accounts
+          ├── google
+          ├── github       (future)
+          └── other       (future)
+```
+
+For the Resto-POS integration, the same concept can be applied to a dedicated `customers` table so customer accounts remain separate from staff/admin accounts.
+
+---
+
+# Configuration
+
+The current database/application configuration is stored in:
+
+```text
+includes/config.php
+```
+
+Typical configuration values include:
+
+```php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'simple_auth');
+define('BASE_URL', 'http://localhost/Simple-Auth-Template/public');
+```
+
+### Planned Google configuration
+
+Google OAuth credentials should not be committed to a public repository.
+
+A future configuration can use environment variables or an ignored local configuration file:
+
+```text
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+GOOGLE_REDIRECT_URI
+```
+
+Recommended repository pattern:
+
+```text
+config/google.example.php   # Safe example with empty values
+config/google.php           # Local secrets; ignored by Git
+```
+
+Never commit a real Google client secret.
+
+---
+
+# Local Auth Flow
+
+## Registration Flow
+
+```text
+User fills registration form
         ↓
 Server receives POST data
         ↓
-sanitize() cleans all inputs
+Validate input
         ↓
-Check if email already exists in DB
-        ↓ (if exists → show error)
-password_hash() hashes the password
+Check whether email already exists
         ↓
-INSERT new user into `users` table
+password_hash()
         ↓
-Redirect to login with success message
+Insert user into MySQL
+        ↓
+Redirect to login
 ```
 
----
+## Login Flow
 
-### Login Flow
-
-```
-User fills login form
+```text
+User enters email + password
         ↓
 Server receives POST data
         ↓
-sanitize() cleans inputs
+Find local user
         ↓
-SELECT user WHERE email = input
-        ↓ (if not found → show error)
-password_verify() checks hash against input
-        ↓ (if mismatch → show error)
-$_SESSION['user_id'] and ['username'] are set
+password_verify()
         ↓
-Redirect to dashboard
+Create PHP session
+        ↓
+Redirect to protected page
 ```
 
----
+## Auth Guard Flow
 
-### Auth Guard Flow
-
-```
-User requests a protected page (e.g. dashboard.php)
+```text
+User requests protected page
         ↓
-auth_guard() is called at the top of the page
+auth_guard()
         ↓
-Checks if $_SESSION['user_id'] is set
-        ↓ (if not set → redirect to login.php)
-Page loads normally
+Check PHP session
+        ↓
+Authenticated?
+   ┌────┴────┐
+  YES        NO
+   ↓          ↓
+Page loads   Redirect to login
 ```
 
----
+## Logout Flow
 
-### Logout Flow
-
-```
+```text
 User clicks logout
         ↓
-logout.php is loaded
+logout.php
         ↓
-session_unset() clears session variables
+session_unset()
         ↓
-session_destroy() destroys the session
+session_destroy()
         ↓
-Redirect to login.php
+Redirect to login
 ```
 
 ---
 
-## Core Functions
+# Core Functions
+
+The authentication layer is centered around functions such as:
 
 ### `register_user($username, $email, $password)`
-Registers a new user. Returns `true` on success or an error string on failure.
 
-```php
-$result = register_user('john', 'john@email.com', 'secret123');
-if ($result === true) {
-    redirect(BASE_URL . '/login.php');
-} else {
-    echo $result; // Error message
-}
-```
-
----
+Creates a local user account and returns a success value or an error.
 
 ### `login_user($email, $password)`
-Verifies credentials and starts a session. Returns `true` on success or an error string.
 
-```php
-$result = login_user('john@email.com', 'secret123');
-if ($result === true) {
-    redirect(BASE_URL . '/dashboard.php');
-}
-```
-
----
+Validates the user's password and creates the authenticated PHP session.
 
 ### `auth_guard()`
-Call this at the very top of any page that requires a logged-in user. If the session is missing, it redirects immediately.
 
-```php
-<?php
-require_once '../includes/auth.php';
-auth_guard(); // Redirects to login if not authenticated
-?>
-```
-
----
+Protects pages that require authentication.
 
 ### `is_logged_in()`
-Returns a boolean. Useful for conditionally showing UI elements (e.g. hiding the login button if already logged in).
+
+Returns whether the current session contains an authenticated local user.
+
+### `logout_user()`
+
+Clears the current authentication session.
+
+> Function names and implementation may evolve as the reusable authentication module is refactored.
+
+---
+
+# Pages & Routes
+
+Current public authentication pages include:
+
+| File | Purpose |
+|---|---|
+| `public/login.php` | Local login form |
+| `public/register.php` | Local registration form |
+| `public/logout.php` | Logout endpoint |
+
+The exact URL depends on the configured local web root.
+
+Example:
+
+```text
+http://localhost/Simple-Auth-Template/public/login.php
+```
+
+Future Google authentication endpoints are expected to live in a dedicated authentication area, for example:
+
+```text
+/auth/google/login.php
+/auth/google/callback.php
+```
+
+The exact path is not finalized during the prototype stage.
+
+---
+
+# Session Management
+
+The local authentication system uses PHP native sessions.
+
+Example local session values:
 
 ```php
-if (is_logged_in()) {
-    echo "Welcome back!";
+$_SESSION['user_id'];
+$_SESSION['username'];
+```
+
+For the future Resto-POS customer authentication flow, customer sessions should remain separate from staff/admin sessions.
+
+Example target design:
+
+```php
+// Customer
+$_SESSION['customer_id'];
+$_SESSION['customer_authenticated'];
+
+// Staff/Admin
+$_SESSION['user_id'];
+$_SESSION['role'];
+```
+
+This separation is important because a customer authenticated through Google must not automatically receive staff or admin privileges.
+
+---
+
+# Google OAuth / OpenID Connect
+
+## Why Google OAuth?
+
+The goal is to allow users to authenticate through their Google account instead of creating another password for the application.
+
+The intended flow is:
+
+```text
+Customer
+   ↓
+Landing Page
+   ↓
+Continue with Google
+   ↓
+Google authentication
+   ↓
+Google identity
+   ↓
+Local customer account
+   ↓
+PHP session
+   ↓
+Ordering system
+```
+
+## OAuth 2.0 vs OpenID Connect
+
+OAuth 2.0 is primarily an authorization protocol. OpenID Connect (OIDC) adds an identity layer on top of OAuth 2.0.
+
+For this project, the requirement is authentication — identifying who the Google user is — so the implementation should use Google's identity capabilities rather than treating an access token as a user ID.
+
+Google's current Sign in with Google documentation identifies the `sub` claim as the unique Google Account identifier and requires server-side verification of the returned ID token. See the official documentation:
+
+https://developers.google.com/identity/gsi/web/reference/html-reference
+
+---
+
+# Google OAuth Prototype
+
+## Prototype Objective
+
+The first milestone is intentionally small.
+
+> **Prove that one Google account can authenticate successfully and create a local PHP session.**
+
+Do not build the complete reusable framework before this works.
+
+### Prototype checklist
+
+```text
+[ ] Create/configure Google Cloud project
+[ ] Configure Google OAuth credentials
+[ ] Configure authorized redirect URI
+[ ] Add Google login button/link
+[ ] Start authentication flow
+[ ] Receive Google's response
+[ ] Validate the response
+[ ] Obtain Google identity
+[ ] Create local PHP session
+[ ] Display authenticated user
+[ ] Logout
+```
+
+The prototype does not need to solve every future use case.
+
+---
+
+# Google OAuth Flow
+
+The target server-side authorization flow is:
+
+```text
+1. User clicks "Continue with Google"
+        ↓
+2. Application generates a random state value
+        ↓
+3. State is stored in the PHP session
+        ↓
+4. Browser is redirected to Google
+        ↓
+5. User selects/authenticates a Google account
+        ↓
+6. Google returns an authorization response
+        ↓
+7. Application validates state
+        ↓
+8. Application exchanges the authorization code / processes the identity response
+        ↓
+9. Application validates the Google identity token
+        ↓
+10. Application finds or creates the local user/customer
+        ↓
+11. Application creates its own PHP session
+        ↓
+12. User is redirected to the application
+```
+
+Google's current identity documentation also supports the Sign in with Google HTML/JavaScript APIs, which can return an ID token directly to a server login endpoint. The exact Google flow should be selected based on the prototype implementation and desired UX.
+
+Official reference:
+
+https://developers.google.com/identity/gsi/web/reference/js-reference
+
+---
+
+# OAuth State
+
+The OAuth `state` value is a security mechanism used to associate the response with the authentication request initiated by the application.
+
+Example:
+
+```php
+$state = bin2hex(random_bytes(32));
+$_SESSION['oauth_state'] = $state;
+```
+
+When the response returns, the application should verify the value before continuing.
+
+Conceptually:
+
+```php
+if (!isset($_GET['state'])) {
+    exit('Missing OAuth state.');
 }
+
+if (!isset($_SESSION['oauth_state'])) {
+    exit('Missing session state.');
+}
+
+if (!hash_equals($_SESSION['oauth_state'], $_GET['state'])) {
+    exit('Invalid OAuth state.');
+}
+
+unset($_SESSION['oauth_state']);
+```
+
+The exact callback parameters depend on the selected Google authentication flow.
+
+---
+
+# Google Identity / ID Token
+
+A Google ID token is a signed JWT containing identity claims.
+
+Important claims include:
+
+```text
+iss       Issuer
+sub       Stable Google account identifier
+aud       Audience / client ID
+email     User email
+name      User name, when provided
+picture   Profile image, when provided
+exp       Token expiration time
+```
+
+The `sub` value should be treated as the provider-specific Google user ID.
+
+Example:
+
+```text
+Google Account
+      ↓
+Google `sub`
+      ↓
+user_oauth_accounts.provider_user_id
+      ↓
+local user_id / customer_id
+      ↓
+PHP session
+```
+
+Do not use the Google access token as the local user ID.
+
+Google's documentation states that the ID token must be verified before trusting its claims and that `exp` is for token validation, not for determining whether the application's local session has ended.
+
+---
+
+# Access Token vs ID Token
+
+These tokens have different purposes.
+
+### ID Token
+
+Used to communicate authenticated identity information to the application.
+
+```text
+Who is the user?
+```
+
+### Access Token
+
+Used to authorize calls to Google APIs on behalf of the user.
+
+```text
+What Google API data/actions did the user authorize?
+```
+
+For the initial login prototype, the application should request only the identity information it actually needs.
+
+Do not add Google API permissions such as Drive, Calendar, YouTube, etc. unless a real feature requires them.
+
+---
+
+# Google Scopes
+
+For a basic identity/login implementation, the target identity scopes are:
+
+```text
+openid
+email
+profile
+```
+
+Only request additional scopes when the application genuinely needs access to another Google API.
+
+This keeps the authentication flow simpler and reduces unnecessary permissions.
+
+---
+
+# Google OAuth Configuration
+
+A web application OAuth client requires configuration such as:
+
+```text
+Client ID
+Client Secret
+Authorized redirect URI
+```
+
+Example development redirect URI:
+
+```text
+http://localhost/Simple-Auth-Template/auth/google/callback.php
+```
+
+Example Resto-POS development URI:
+
+```text
+http://localhost/Resto-POS/auth/google/callback.php
+```
+
+Production should use the actual HTTPS domain and a registered redirect URI.
+
+Redirect URIs must match the Google configuration exactly.
+
+For production deployments, Google requires secure redirect URIs and JavaScript origins. See:
+
+https://developers.google.com/identity/protocols/oauth2/production-readiness/policy-compliance
+
+---
+
+# Google Account Mapping
+
+The application should maintain its own user/customer record.
+
+The preferred mapping is:
+
+```text
+Google
+  │
+  │ provider = google
+  │ provider_user_id = sub
+  ▼
+OAuth account table
+  │
+  │ local user_id / customer_id
+  ▼
+Application account
+  │
+  ▼
+PHP session
+```
+
+### Existing Google account
+
+```text
+Google identity received
+        ↓
+Find provider + provider_user_id
+        ↓
+Found
+        ↓
+Load local account
+        ↓
+Create session
+```
+
+### New Google account
+
+```text
+Google identity received
+        ↓
+Provider account not found
+        ↓
+Check local email/account rules
+        ↓
+Create or link local account
+        ↓
+Create OAuth relationship
+        ↓
+Create session
+```
+
+Account-linking rules must be designed carefully before production. Automatically merging accounts solely because an email address matches should only be done when the application's identity rules support it safely.
+
+---
+
+# Resto-POS Integration
+
+The first real integration target is the Resto-POS customer landing page.
+
+The authentication systems should remain logically separate:
+
+### Customer
+
+```text
+Landing Page
+    ↓
+Google Login / Local Customer Login
+    ↓
+customer_id
+    ↓
+Menu
+    ↓
+Cart
+    ↓
+Checkout
+    ↓
+Order
+```
+
+### Staff/Admin
+
+```text
+Existing Staff/Admin Login
+    ↓
+Role
+    ↓
+POS / Admin Dashboard
+```
+
+### Important rule
+
+```text
+Customer authentication ≠ Staff/Admin authorization
+```
+
+A Google-authenticated customer must not receive `admin` or `staff` permissions simply because the customer authenticated successfully.
+
+This matches the larger Resto-POS architecture direction where customer, staff, and administrator functions are protected independently.
+
+---
+
+# Reusable OAuth Architecture
+
+The long-term goal is to make the Google implementation reusable instead of writing a separate Google login implementation for every project.
+
+The target architecture is approximately:
+
+```text
+Simple-Auth-Template
+│
+├── Local Authentication
+│
+├── OAuth Layer
+│   ├── Google
+│   ├── GitHub (future)
+│   └── Other providers (future)
+│
+├── User / Customer Mapping
+│
+└── Session Management
+```
+
+Application-specific code should communicate with the reusable authentication layer rather than directly implementing Google's protocol everywhere.
+
+A future API could expose functions similar to:
+
+```php
+google_authorization_url();
+google_handle_callback();
+google_get_identity();
+find_or_create_oauth_user();
+```
+
+Or, if the project remains procedural:
+
+```php
+google_get_authorization_url();
+google_handle_callback();
+google_get_user();
+google_find_or_create_user();
+```
+
+The exact API is intentionally not finalized during the prototype stage.
+
+---
+
+# Configuration-Based Reuse
+
+Different projects should eventually provide only their own configuration.
+
+Example:
+
+```php
+$googleConfig = [
+    'client_id' => GOOGLE_CLIENT_ID,
+    'client_secret' => GOOGLE_CLIENT_SECRET,
+    'redirect_uri' => GOOGLE_REDIRECT_URI,
+];
+```
+
+The OAuth logic should not need to know whether it is being used by:
+
+- Resto-POS
+- A portfolio
+- A blog
+- An e-commerce project
+- A school project
+- Another PHP application
+
+Only the configuration and application-specific user mapping should change.
+
+---
+
+# Development Roadmap
+
+The recommended order is:
+
+```text
+Prototype
+    ↓
+MVP
+    ↓
+Resto-POS Integration
+    ↓
+Reusable Authentication Module
+    ↓
+Open Source Release
+```
+
+## Phase 1 — Prototype
+
+**Priority: CURRENT**
+
+Goal: prove that Google authentication works.
+
+```text
+[ ] Google Cloud configuration
+[ ] OAuth credentials
+[ ] Login UI
+[ ] Google authentication flow
+[ ] Callback / response handling
+[ ] State / security validation
+[ ] Identity verification
+[ ] PHP session
+[ ] Logout
+```
+
+### Prototype definition of done
+
+One Google account can:
+
+```text
+Click Login
+   ↓
+Authenticate with Google
+   ↓
+Return to the application
+   ↓
+Be recognized by PHP
+   ↓
+Receive a local authenticated session
+   ↓
+Access a protected page
+   ↓
+Logout
 ```
 
 ---
 
-## Pages & Routes
+## Phase 2 — MVP
 
-| File | URL | Access | Description |
-|------|-----|--------|-------------|
-| `index.php` | `/` | Public | Landing page, redirects based on session |
-| `register.php` | `/register.php` | Public | New user registration form |
-| `login.php` | `/login.php` | Public | Login form |
-| `dashboard.php` | `/dashboard.php` | Protected | Main page after login |
-| `logout.php` | `/logout.php` | Protected | Destroys session, redirects to login |
+Goal: connect Google authentication to the local database.
 
----
-
-## Session Management
-
-Sessions are PHP native (`$_SESSION`). The following keys are used:
-
-| Key | Set When | Value |
-|-----|----------|-------|
-| `$_SESSION['user_id']` | Login success | User's `id` from DB |
-| `$_SESSION['username']` | Login success | User's `username` from DB |
-| `$_SESSION['flash']` | After form actions | Temporary status messages |
-
-Sessions are destroyed completely on logout via `session_unset()` + `session_destroy()`.
-
----
-
-## Security Practices
-
-Simple-Auth-Template follows these security principles out of the box:
-
-| Practice | How It's Applied |
-|----------|-----------------|
-| **Password Hashing** | `password_hash()` with `PASSWORD_BCRYPT` |
-| **Input Sanitization** | `sanitize()` wraps `htmlspecialchars()` + `trim()` |
-| **No Plain Text Passwords** | Passwords are never stored or logged as plain text |
-| **Session-based Auth** | No tokens stored in URLs or cookies manually |
-| **Protected Routes** | `auth_guard()` must be called on every protected page |
-
-### What's NOT included (yet) — planned for v2+
-
-- CSRF token protection on forms
-- Rate limiting on login attempts
-- Prepared statements (recommended upgrade — replace `mysqli_query` with `mysqli_prepare`)
-- HTTPS enforcement
-
-> **Recommended:** Switch all raw `mysqli_query()` calls to **prepared statements** before deploying to production. This prevents SQL injection.
-
----
-
-## UI & Styling
-
-The base template uses plain HTML and CSS. To upgrade the UI:
-
-### Adding Bootstrap
-
-In `templates/header.php`, add inside `<head>`:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+```text
+[ ] OAuth account table
+[ ] Local user/customer mapping
+[ ] Existing account detection
+[ ] New account creation
+[ ] Safe account-linking rules
+[ ] Customer session
+[ ] Error handling
+[ ] Secure configuration
+[ ] Session ID regeneration after authentication
 ```
 
-And before `</body>` in `templates/footer.php`:
+Result:
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-```
-
-### Adding Font Awesome
-
-In `templates/header.php`, add inside `<head>`:
-
-```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+```text
+Google Authentication
+        ↓
+Local MySQL Account
+        ↓
+Application Session
 ```
 
 ---
 
-## Extending the Template
+## Phase 3 — Resto-POS Integration
 
-### Adding a New Protected Page
+Goal: connect customer authentication to the restaurant landing page and ordering flow.
 
-1. Create `public/your-page.php`
-2. Add `auth_guard()` at the top
-3. Include header and footer templates
+```text
+Landing Page
+    ↓
+Customer Login
+    ↓
+Google / Local Auth
+    ↓
+Customer Session
+    ↓
+Menu
+    ↓
+Cart
+    ↓
+Checkout
+    ↓
+Order
+```
+
+Staff/admin authentication remains separate.
+
+---
+
+## Phase 4 — Reusable Authentication Module
+
+Goal: make the authentication system portable to other PHP projects.
+
+```text
+[ ] Separate OAuth logic
+[ ] Configuration system
+[ ] Provider abstraction
+[ ] Reusable user mapping
+[ ] Better error handling
+[ ] Security hardening
+[ ] Example integration
+[ ] Installation guide
+```
+
+---
+
+## Phase 5 — Open Source Release
+
+Goal: make the project usable by other developers.
+
+```text
+[ ] Clean README
+[ ] Full Documentation.md
+[ ] Installation guide
+[ ] Google Cloud setup guide
+[ ] Database schema
+[ ] Example configuration
+[ ] Security guide
+[ ] Contributing guide
+[ ] License
+[ ] Example project
+[ ] Remove all secrets/test credentials
+```
+
+---
+
+# Security Practices
+
+The current project is an educational/reusable starter and should be hardened before production use.
+
+## Current practices
+
+| Practice | Status / Direction |
+|---|---|
+| Password hashing | Use `password_hash()` |
+| Password verification | Use `password_verify()` |
+| PHP sessions | Used for application authentication |
+| Protected routes | Use authentication guards |
+| OAuth state | Required for OAuth authorization flows |
+| Google ID token validation | Required before trusting identity claims |
+| HTTPS | Required for production |
+| Prepared statements | Recommended for all database queries |
+| CSRF protection | Required before production |
+| Rate limiting | Recommended for login endpoints |
+| Secret management | Never commit client secrets |
+
+## OAuth security checklist
+
+```text
+[ ] Validate state
+[ ] Use cryptographically random state values
+[ ] Validate ID token signature / claims using an appropriate library or Google's recommended verification method
+[ ] Validate issuer
+[ ] Validate audience/client ID
+[ ] Validate expiration
+[ ] Protect client secret
+[ ] Use exact redirect URIs
+[ ] Use HTTPS in production
+[ ] Do not store unnecessary Google tokens
+[ ] Request only required scopes
+```
+
+## Session security checklist
+
+```text
+[ ] Regenerate session ID after successful login
+[ ] Use secure cookies in production
+[ ] Use HttpOnly cookies
+[ ] Use SameSite cookie protection
+[ ] Destroy sessions on logout
+[ ] Keep customer and staff/admin sessions logically separate
+```
+
+## Database security checklist
+
+```text
+[ ] Use prepared statements
+[ ] Validate input
+[ ] Use unique provider identifiers
+[ ] Avoid storing unnecessary OAuth tokens
+[ ] Never store Google passwords
+```
+
+---
+
+# Common Errors & Fixes
+
+| Error | Likely Cause | Fix |
+|---|---|---|
+| `Connection failed` | Wrong MySQL credentials | Check `includes/config.php` |
+| Blank page after login | Session not started | Start the PHP session before accessing `$_SESSION` |
+| Redirect loop | Auth guard/session mismatch | Check session initialization and guard logic |
+| `Call to undefined function` | Missing include | Verify `require_once` paths |
+| Password always wrong | Incorrect hashing/verification | Hash during registration and verify during login |
+| `redirect_uri_mismatch` | Callback URI does not exactly match Google configuration | Check Google OAuth client settings and application URI |
+| Invalid OAuth state | State was missing, changed, or session state was lost | Generate/store/validate state correctly |
+| Invalid ID token | Token failed validation | Validate signature and required claims before creating a session |
+| Google login works but local account is missing | OAuth identity was not mapped to local DB | Implement provider/account mapping |
+
+---
+
+# UI & Styling
+
+The project currently uses plain HTML and CSS.
+
+The authentication UI can be styled independently from the authentication logic.
+
+This is important for reuse: a future project should be able to use the same authentication backend while providing its own UI.
+
+---
+
+# Extending the Template
+
+## Adding a Protected Page
+
+A protected page should include the authentication layer and call the appropriate guard before displaying private content.
+
+Conceptually:
 
 ```php
 <?php
 require_once '../includes/auth.php';
 auth_guard();
-require_once '../templates/header.php';
 ?>
 
-<h1>Your Page</h1>
-
-<?php require_once '../templates/footer.php'; ?>
+<h1>Protected Page</h1>
 ```
 
+The exact include path depends on the page location.
+
 ---
 
-### Adding a New Database Column
+## Adding OAuth Providers Later
 
-1. Run the ALTER query in phpMyAdmin or CLI:
+The planned provider model is:
 
-```sql
-ALTER TABLE users ADD COLUMN profile_pic VARCHAR(255) DEFAULT NULL;
+```text
+Authentication
+├── Local
+├── Google
+├── GitHub
+└── Future Providers
 ```
 
-2. Update `register_user()` in `auth.php` to include the new field in the INSERT query.
+Each provider should be responsible for its provider-specific authentication flow while the application continues using its own local user/customer ID.
 
 ---
 
-### Adding Roles (v3 Preview)
+# FAQ
 
-Add a `role` column to the users table:
+### Can I use this with Laravel?
 
-```sql
-ALTER TABLE users ADD COLUMN role ENUM('user', 'admin') DEFAULT 'user';
+Yes, but the current project is intentionally framework-free. A Laravel implementation would likely use Laravel's authentication and OAuth ecosystem instead of copying the procedural implementation directly.
+
+### Is Google OAuth already production-ready?
+
+No. The current Google work is planned as a **prototype first**. Security validation, account linking, secret management, HTTPS, error handling, and production configuration must be completed before production deployment.
+
+### Do I need an access token just to log users in with Google?
+
+Not necessarily. Basic Google authentication focuses on obtaining and verifying the user's identity. An access token is primarily needed when the application wants to call an authorized Google API on the user's behalf.
+
+### Should the Google ID be the same as my application's user ID?
+
+No. Keep a local application user/customer ID and map the Google provider ID (`sub`) to that local account.
+
+### Can this eventually support GitHub or other providers?
+
+Yes. That is one of the long-term goals. The provider-specific implementation should be separated from the application's local account/session logic.
+
+### Why keep customer authentication separate from staff/admin authentication in Resto-POS?
+
+Because authentication answers **who the user is**, while authorization determines **what the user is allowed to do**. A customer signing in with Google should not automatically gain staff/admin privileges.
+
+### Why not build the reusable framework first?
+
+Because the project is still validating the Google authentication flow. The recommended approach is to make the smallest working prototype first, then refactor the working implementation into reusable components.
+
+---
+
+# References
+
+## Google
+
+- Google OAuth 2.0 documentation:
+  https://developers.google.com/identity/protocols/oauth2
+
+- Google Sign in with Google HTML API reference:
+  https://developers.google.com/identity/gsi/web/reference/html-reference
+
+- Google Sign in with Google JavaScript API reference:
+  https://developers.google.com/identity/gsi/web/reference/js-reference
+
+- Google OAuth production-readiness and policy guidance:
+  https://developers.google.com/identity/protocols/oauth2/production-readiness/policy-compliance
+
+## Project
+
+- Repository:
+  https://github.com/devstygian/Simple-Auth-Template
+
+## Video Reference
+
+- YouTube reference used during planning:
+  https://youtu.be/z4tU69VlHFQ
+
+---
+
+# Current Priority
+
+The immediate goal is **Phase 1 — Prototype**.
+
+Do not implement the entire reusable authentication architecture yet.
+
+The next development target is:
+
+```text
+Simple-Auth-Template
+        ↓
+Google Login
+        ↓
+Google Identity
+        ↓
+PHP Session
+        ↓
+Protected Page
 ```
 
-Then create a role guard function in `auth.php`:
-
-```php
-function admin_guard() {
-    auth_guard();
-    if ($_SESSION['role'] !== 'admin') {
-        redirect(BASE_URL . '/dashboard.php');
-    }
-}
-```
+Once that flow works reliably, the project can move to MySQL account mapping, Resto-POS integration, reusable abstractions, and finally an open-source release.
 
 ---
 
-## Common Errors & Fixes
-
-| Error | Likely Cause | Fix |
-|-------|-------------|-----|
-| `Connection failed` | Wrong DB credentials | Check `config.php` values |
-| Blank page after login | Session not starting | Add `session_start()` at top of `auth.php` |
-| Redirect loop on dashboard | `auth_guard()` misconfigured | Make sure `session_start()` runs before the guard check |
-| `Call to undefined function` | Missing `require_once` | Ensure `auth.php` is included on the page |
-| Password always wrong | Hashing issue | Make sure you're hashing on register, not on login |
-
----
-
-## FAQ
-
-**Q: Can I use this with a framework like Laravel?**
-Yes, but you'd essentially be replacing most of the logic. The roadmap includes an optional Laravel conversion in v4 for those who want to migrate.
-
-**Q: Is this safe for production?**
-The core is a solid starting point, but before going live you should add CSRF protection, use prepared statements everywhere, and enforce HTTPS. See the [Security Practices](#security-practices) section.
-
-**Q: Can I add OAuth (Google/GitHub login)?**
-Not out of the box, but it's a great v3/v4 contribution idea. You'd add a `provider` and `provider_id` column to the users table and handle the OAuth callback in a new file.
-
-**Q: Why no framework?**
-By design. Simple-Auth-Template is meant to be readable and educational. Anyone who knows basic PHP can understand and modify it without needing to learn a framework first.
-
----
-
-*Documentation maintained by the Simple-Auth-Template contributors. For issues or suggestions, open a GitHub Issue.*
+*Documentation maintained as the Simple-Auth-Template project evolves.*
