@@ -1,39 +1,21 @@
 <?php
-// login.php
-include '../includes/config.php';
+require_once '../includes/auth.php';
 
-//start session and check if user is already logged in
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if (is_logged_in()) {
+    redirect(APP_URL . '/main.php');
 }
 
-//if already logged in, redirect to main page
-if (isset($_SESSION['users']) && !empty($_SESSION['users'])) {
-    header('Location: ../main.php');
-    exit();
-}
-
-$error = '';
+$error = get_flash('error');
+$success = get_flash('success');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $result = login_user($_POST['email'] ?? '', $_POST['password'] ?? '');
 
-    // prepared statement to petch user
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $user = $result->fetch_assoc();
-    if ($user && password_verify($password, $user['password'])) {
-        // valid login
-        $_SESSION['users'] = $user; // store user data in session
-        header('Location: ../main.php');
-        exit();
-    } else {
-        $error = 'Invalid username or password';
+    if ($result === true) {
+        redirect(APP_URL . '/main.php');
     }
+
+    $error = $result;
 }
 ?>
 <!DOCTYPE html>
@@ -49,14 +31,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-card">
         <h2>Login</h2>
+        <?php if (!empty($success)) : ?>
+            <p style="color: green; text-align: center; margin-bottom: 20px;"><?php echo sanitize($success); ?></p>
+        <?php endif; ?>
+        <?php if (!empty($error)) : ?>
+            <p style="color: red; text-align: center; margin-bottom: 20px;"><?php echo sanitize($error); ?></p>
+        <?php endif; ?>
         <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
-            <?php if (!empty($error)) echo "<p style='color:red;'>$error</p>"; ?>
             <button type="submit">Login</button>
-            <p><a href="forgot-password.php">Forgot Password?</a></p>
+            <button type="button" onclick="window.location.href='reset-password.php'">Forgot Password</button>
             <p>Don't have an account? Register <a href="register.php">here.</a></p>
         </form>
+        <div class="auth-divider">or</div>
+        <a class="google-button" href="google-login.php">Continue with Google</a>
     </div>
 </body>
 
