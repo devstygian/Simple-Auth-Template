@@ -1,40 +1,20 @@
 <?php
-include '../includes/config.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once '../includes/auth.php';
 
 $error = '';
-$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $result = register_user(
+        $_POST['username'] ?? '',
+        $_POST['email'] ?? '',
+        $_POST['password'] ?? ''
+    );
 
-    if ($username === '' || $password === '') {
-        $error = 'Username and password are required.';
+    if ($result === true) {
+        set_flash('success', 'Registration successful. You can now log in.');
+        redirect(BASE_URL . '/login.php');
     } else {
-        $stmt = $conn->prepare('SELECT id FROM users WHERE username = ?');
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $error = 'That username is already taken.';
-        } else {
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $insert = $conn->prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-            $insert->bind_param('ss', $username, $hashed);
-
-            if ($insert->execute()) {
-                $success = 'Registration successful. You can now log in.';
-            } else {
-                $error = 'Unable to register. Please try again later.';
-            }
-            $insert->close();
-        }
-        $stmt->close();
+        $error = $result;
     }
 }
 ?>
@@ -51,17 +31,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-card">
         <h2>Register</h2>
         <?php if (!empty($error)) : ?>
-            <p style="color: red; text-align: center; margin-bottom: 20px;"><?php echo htmlspecialchars($error); ?></p>
-        <?php endif; ?>
-        <?php if (!empty($success)) : ?>
-            <p style="color: green; text-align: center; margin-bottom: 20px;"><?php echo htmlspecialchars($success); ?></p>
+            <p style="color: red; text-align: center; margin-bottom: 20px;"><?php echo sanitize($error); ?></p>
         <?php endif; ?>
         <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-            <input type="text" id="username" name="username" placeholder="Username" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Register</button>
         </form>
         <p>Already have an account? <a href="login.php">Login</a></p>
+        <div class="auth-divider">or</div>
+        <a class="google-button" href="google-login.php">Continue with Google</a>
     </div>
 </body>
 </html>

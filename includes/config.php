@@ -1,32 +1,13 @@
 <?php
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'simple_auth');
+define('BASE_URL', 'http://localhost/git-projects/Simple-Auth-Template/public');
+define('APP_URL', 'http://localhost/git-projects/Simple-Auth-Template');
+
+require_once __DIR__ . '/config.local.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
-}
-
-$conn = new mysqli(
-    "localhost",
-    "root",
-    "",
-    "authdb"
-);
-
-//
-error_reporting(0);
-ini_set('display_errors', 0);
-
-$base_url = "http://localhost/git-projects/Simple-Auth-Template/";
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-function checkLogin()
-{
-    global $base_url;
-
-    if (!isset($_SESSION['users']) || empty($_SESSION['users'])) {
-        header("Location: {$base_url}public/login.php");
-        exit();
-    }
 }

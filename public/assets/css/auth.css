@@ -64,6 +64,7 @@ body {
 
 /* ===== FORM ELEMENTS ===== */
 .login-card form input[type="text"],
+.login-card form input[type="email"],
 .login-card form input[type="password"] {
     width: 100%;
     padding: 12px 16px;
@@ -75,6 +76,7 @@ body {
 }
 
 .login-card form input[type="text"]:focus,
+.login-card form input[type="email"]:focus,
 .login-card form input[type="password"]:focus {
     border-color: #2e7d32;
     box-shadow: 0 0 5px #205723;
@@ -84,23 +86,48 @@ body {
 .login-card form button {
     width: 100%;
     padding: 12px;
-    background: #2e7d32;
-    border: none;
+   
+    border: 1px solid black;
     border-radius: 12px;
-    color: #fff;
+    color: #0a0a0a;
     font-size: 18px;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
 }
 
 .login-card form button:hover {
-    background: #1b4b1e;
+    background: #252525;
+    color: white;
     transform: scale(1.02);
 }
 
 .login-card form p {
     text-align: center;
     font-size: 14px;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 18px 0 12px;
+    color: #666;
+    font-size: 13px;
+}
+
+.google-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: #4285F4;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.google-button:hover {
+    background: #3367d6;
 }
 
 /* ===== PASSWORD TOGGLE ICON ===== */

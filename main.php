@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/includes/auth.php';
+auth_guard();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -366,7 +370,7 @@
             <a href="#contact">Contact</a>
         </div>
 
-        <a href="logout.php" class="nav-button">
+        <a href="public/logout.php" class="nav-button">
             Log Out
         </a>
     </nav>
@@ -440,6 +444,10 @@
                     <span class="price">
                         ₱180
                     </span>
+
+                    <a href="src/checkOut.php" class="secondary-button">
+                        Add to Cart
+                    </a>
                 </div>
 
             </div>
