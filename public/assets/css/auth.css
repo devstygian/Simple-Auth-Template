@@ -1,141 +1,594 @@
-/* ===== GLOBAL ===== */
-* {
+/* =====================================================
+   NADINE'S CATERING
+   AUTHENTICATION STYLES
+   ===================================================== */
+
+
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
+   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+:root {
+    --cream: #f1f6df;
+    --light-green: #e5efd0;
+    --green: #285c3a;
+    --dark-green: #1f4b30;
+    --gold: #c9ad61;
+    --text: #26382b;
+    --muted: #6c776d;
+    --white: #ffffff;
+    --border: #d5dccd;
+    --error: #b94a48;
+    --success: #39734a;
+}
+
 body {
-    font-family: 'Cremona', serif;
-    background: #ccf7ce;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-family: Georgia, "Times New Roman", serif;
+    background: var(--cream);
+    color: var(--text);
+
     min-height: 100vh;
 }
 
-/* ===== LOGIN PAGE ===== */
-.login-body {
+
+/* =====================================================
+   AUTH PAGE
+   ===================================================== */
+
+.auth-page {
+    display: flex;
     width: 100%;
+    min-height: 100vh;
 }
 
-.login-card {
-    background: #daf8ba;
-    padding: 50px 40px;
-    border-radius: 20px;
-    width: 380px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+
+/* =====================================================
+   BRANDING SIDE
+   ===================================================== */
+
+.branding-side {
+    width: 52%;
+    min-height: 100vh;
+
+    background: var(--cream);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
 }
 
-.login-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+
+/* Image from the design you provided */
+
+.branding-image {
+    width: 100%;
+    height: 100%;
+
+    background-image: url("../images/nadines-cover.jpg");
+    background-size: cover;
+    background-position: center;
+
+    background-repeat: no-repeat;
 }
 
-.login-card h2 {
+
+/* =====================================================
+   FORM SIDE
+   ===================================================== */
+
+.form-side {
+    width: 48%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 50px;
+
+    background: #fafbf3;
+}
+
+
+/* =====================================================
+   AUTH CARD
+   ===================================================== */
+
+.auth-card {
+    width: 100%;
+    max-width: 430px;
+
+    background: var(--white);
+
+    padding: 45px 42px;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(40, 92, 58, 0.08);
+
+    box-shadow:
+        0 15px 40px rgba(31, 75, 48, 0.08);
+}
+
+
+/* =====================================================
+   MOBILE BRAND
+   ===================================================== */
+
+.mobile-brand {
+    display: none;
+
     text-align: center;
+
     margin-bottom: 30px;
-    font-size: 28px;
-    color: #333;
 }
 
-/* ===== ROUND LOGO ===== */
-.login-card img {
-    display: block;
-    margin: 0 auto 25px auto;
-    width: 120px;
-    height: 120px;
-    border-radius: 10%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    object-fit: cover;
-    transition: transform 0.3s;
+.mobile-brand h1 {
+    font-size: 42px;
+    font-weight: normal;
+
+    color: var(--green);
+
+    margin-bottom: 5px;
 }
 
-.login-card img:hover {
-    transform: scale(1.05);
-    /* small zoom effect on hover */
+.mobile-brand span {
+    color: var(--gold);
+
+    font-size: 15px;
+
+    letter-spacing: 5px;
 }
 
-.login-card img:hover {
-    transform: scale(1.05);
-    /* slight zoom effect on hover */
-}
 
-/* ===== FORM ELEMENTS ===== */
-.login-card form input[type="text"],
-.login-card form input[type="email"],
-.login-card form input[type="password"] {
-    width: 100%;
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    transition: border 0.3s, box-shadow 0.3s;
-}
+/* =====================================================
+   AUTH HEADER
+   ===================================================== */
 
-.login-card form input[type="text"]:focus,
-.login-card form input[type="email"]:focus,
-.login-card form input[type="password"]:focus {
-    border-color: #2e7d32;
-    box-shadow: 0 0 5px #205723;
-    outline: none;
-}
-
-.login-card form button {
-    width: 100%;
-    padding: 12px;
-   
-    border: 1px solid black;
-    border-radius: 12px;
-    color: #0a0a0a;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.login-card form button:hover {
-    background: #252525;
-    color: white;
-    transform: scale(1.02);
-}
-
-.login-card form p {
+.auth-header {
     text-align: center;
+
+    margin-bottom: 30px;
+}
+
+.auth-header h2 {
+    color: var(--green);
+
+    font-size: 30px;
+
+    font-weight: normal;
+
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   MESSAGES
+   ===================================================== */
+
+.message {
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+
+    font-family: Arial, sans-serif;
+
     font-size: 14px;
 }
 
-.auth-divider {
-    text-align: center;
-    margin: 18px 0 12px;
-    color: #666;
-    font-size: 13px;
+.error-message {
+    color: var(--error);
+
+    background: #fff1f1;
+
+    border: 1px solid #f0cccc;
 }
 
-.google-button {
-    display: block;
+.success-message {
+    color: var(--success);
+
+    background: #eff8f0;
+
+    border: 1px solid #c9e4cc;
+}
+
+
+/* =====================================================
+   FORM
+   ===================================================== */
+
+.auth-form {
     width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    background: #4285F4;
-    color: #fff;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
     font-weight: 600;
 }
 
+
+/* =====================================================
+   INPUTS
+   ===================================================== */
+
+.form-group input {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: #fcfdf9;
+
+    color: var(--text);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.25s,
+        box-shadow 0.25s,
+        background 0.25s;
+}
+
+.form-group input::placeholder {
+    color: #9ca49d;
+}
+
+.form-group input:focus {
+    border-color: var(--green);
+
+    background: var(--white);
+
+    box-shadow:
+        0 0 0 3px rgba(40, 92, 58, 0.10);
+}
+
+
+/* =====================================================
+   FORGOT PASSWORD
+   ===================================================== */
+
+.forgot-password {
+    text-align: right;
+
+    margin-top: -8px;
+
+    margin-bottom: 22px;
+}
+
+.forgot-password a {
+    color: var(--green);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
+    color: var(--dark-green);
+
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   PRIMARY BUTTON
+   ===================================================== */
+
+.primary-button {
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: var(--green);
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s,
+        transform 0.2s,
+        box-shadow 0.25s;
+}
+
+.primary-button:hover {
+    background: var(--dark-green);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 15px rgba(40, 92, 58, 0.20);
+}
+
+.primary-button:active {
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   ACCOUNT TEXT
+   ===================================================== */
+
+.account-text {
+    margin-top: 22px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+}
+
+.account-text a {
+    color: var(--green);
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.account-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   DIVIDER
+   ===================================================== */
+
+.auth-divider {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 25px 0;
+
+    color: #9da59e;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background: #e1e5dc;
+}
+
+.auth-divider span {
+    padding: 0 4px;
+}
+
+
+/* =====================================================
+   GOOGLE BUTTON
+   ===================================================== */
+
+.google-button {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #d9ddd7;
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: #333;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background 0.25s,
+        border-color 0.25s,
+        box-shadow 0.25s;
+}
+
 .google-button:hover {
-    background: #3367d6;
+    background: #fafafa;
+
+    border-color: #c7ccc5;
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.06);
 }
 
-/* ===== PASSWORD TOGGLE ICON ===== */
-#togglePassword i {
-    color: #888;
-    font-size: 16px;
+
+/* =====================================================
+   GOOGLE ICON
+   ===================================================== */
+
+.google-icon {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 22px;
+    height: 22px;
+
+    color: #4285f4;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 18px;
+
+    font-weight: bold;
 }
 
-#togglePassword:hover i {
-    color: #d9534f;
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.auth-footer {
+    margin-top: 30px;
+
+    text-align: center;
+
+    color: #a0a89f;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+    .branding-side {
+        width: 45%;
+    }
+
+    .form-side {
+        width: 55%;
+
+        padding: 30px;
+    }
+
+    .auth-card {
+        padding: 35px 30px;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .auth-page {
+        display: block;
+    }
+
+    /*
+       Hide the large branding image on smaller screens.
+    */
+
+    .branding-side {
+        display: none;
+    }
+
+    .form-side {
+        width: 100%;
+        min-height: 100vh;
+
+        padding: 25px 18px;
+    }
+
+    .auth-card {
+        max-width: 450px;
+
+        padding: 35px 25px;
+
+        box-shadow: none;
+
+        border: none;
+    }
+
+    .mobile-brand {
+        display: block;
+    }
+
+}
+
+
+@media (max-width: 400px) {
+
+    .form-side {
+        padding: 15px;
+    }
+
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .mobile-brand h1 {
+        font-size: 36px;
+    }
+
+    .auth-header h2 {
+        font-size: 26px;
+    }
+
 }
